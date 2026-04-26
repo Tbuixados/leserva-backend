@@ -7,6 +7,10 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import configuration from './config/configuration';
+import { Business } from './businesses/entities/business.entity';
+import { BusinessesModule } from './businesses/businesses.module';
+import { Category } from './categories/entities/category.entity';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -24,7 +28,7 @@ import configuration from './config/configuration';
         username: config.get('database.user'),
         password: config.get('database.password'),
         database: config.get('database.name'),
-        entities: [User],
+        entities: [User, Business, Category],
         migrations: [],
         synchronize: process.env.NODE_ENV === 'development',
         logging: config.get('app.env') === 'development',
@@ -41,6 +45,8 @@ import configuration from './config/configuration';
 
     AuthModule,
     UsersModule,
+    BusinessesModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
 })
