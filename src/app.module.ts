@@ -3,6 +3,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { User } from './users/entities/user.entity';
 import configuration from './config/configuration';
 
 @Module({
@@ -21,9 +24,9 @@ import configuration from './config/configuration';
         username: config.get('database.user'),
         password: config.get('database.password'),
         database: config.get('database.name'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
-        synchronize: false,
+        entities: [User],
+        migrations: [],
+        synchronize: process.env.NODE_ENV === 'development',
         logging: config.get('app.env') === 'development',
       }),
       inject: [ConfigService],
@@ -35,6 +38,9 @@ import configuration from './config/configuration';
         limit: 100,
       },
     ]),
+
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
 })

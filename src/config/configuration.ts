@@ -17,13 +17,4 @@ export default () => ({
     accessExpiresIn: '15m',
     refreshExpiresIn: '7d',
   },
-  google: {
-    clientId: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackUrl: process.env.GOOGLE_CALLBACK_URL,
-  },
-  resend: {
-    apiKey: process.env.RESEND_API_KEY,
-    fromEmail: process.env.RESEND_FROM_EMAIL || 'noreply@leserva.com',
-  },
 });
