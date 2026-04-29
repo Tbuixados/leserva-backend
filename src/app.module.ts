@@ -11,6 +11,10 @@ import { Business } from './businesses/entities/business.entity';
 import { BusinessesModule } from './businesses/businesses.module';
 import { Category } from './categories/entities/category.entity';
 import { CategoriesModule } from './categories/categories.module';
+import { Service } from './services/entities/service.entity';
+import { ServicesModule } from './services/services.module';
+import { Professional } from './professionals/entities/professional.entity';
+import { ProfessionalsModule } from './professionals/professionals.module';
 
 @Module({
   imports: [
@@ -28,7 +32,7 @@ import { CategoriesModule } from './categories/categories.module';
         username: config.get('database.user'),
         password: config.get('database.password'),
         database: config.get('database.name'),
-        entities: [User, Business, Category],
+        entities: [User, Business, Category, Service, Professional],
         migrations: [],
         synchronize: process.env.NODE_ENV === 'development',
         logging: config.get('app.env') === 'development',
@@ -47,6 +51,8 @@ import { CategoriesModule } from './categories/categories.module';
     UsersModule,
     BusinessesModule,
     CategoriesModule,
+    ServicesModule,
+    ProfessionalsModule,
   ],
   controllers: [AppController],
 })
