@@ -15,6 +15,8 @@ import { Service } from './services/entities/service.entity';
 import { ServicesModule } from './services/services.module';
 import { Professional } from './professionals/entities/professional.entity';
 import { ProfessionalsModule } from './professionals/professionals.module';
+import { Schedule } from './schedules/entities/schedule.entity';
+import { SchedulesModule } from './schedules/schedules.module';
 
 @Module({
   imports: [
@@ -32,7 +34,7 @@ import { ProfessionalsModule } from './professionals/professionals.module';
         username: config.get('database.user'),
         password: config.get('database.password'),
         database: config.get('database.name'),
-        entities: [User, Business, Category, Service, Professional],
+        entities: [User, Business, Category, Service, Professional, Schedule],
         migrations: [],
         synchronize: process.env.NODE_ENV === 'development',
         logging: config.get('app.env') === 'development',
@@ -53,6 +55,7 @@ import { ProfessionalsModule } from './professionals/professionals.module';
     CategoriesModule,
     ServicesModule,
     ProfessionalsModule,
+    SchedulesModule,
   ],
   controllers: [AppController],
 })
