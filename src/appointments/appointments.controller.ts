@@ -40,7 +40,7 @@ export class AppointmentsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   create(@Body() dto: CreateAppointmentDto, @CurrentUser() user: User) {
-    return this.appointmentsService.create(user.id, dto);
+    return this.appointmentsService.create(user, dto);
   }
 
   // El cliente ve sus propias reservas

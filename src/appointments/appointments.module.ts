@@ -8,6 +8,7 @@ import { Service } from '../services/entities/service.entity';
 import { Schedule } from '../schedules/entities/schedule.entity';
 import { Business } from '../businesses/entities/business.entity';
 import { BusinessesModule } from '../businesses/businesses.module';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { BusinessesModule } from '../businesses/businesses.module';
       Business,
     ]),
     BusinessesModule,
+    NotificationsModule,
   ],
   controllers: [AppointmentsController],
   providers: [AppointmentsService],

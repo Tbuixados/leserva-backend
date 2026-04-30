@@ -16,6 +16,8 @@ import {
 } from '../businesses/entities/business.entity';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { AvailableSlotsDto } from './dto/available-slots.dto';
+import { NotificationsService } from '../notifications/notifications.service';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class AppointmentsService {
@@ -30,6 +32,7 @@ export class AppointmentsService {
     private readonly schedulesRepository: Repository<Schedule>,
     @InjectRepository(Business)
     private readonly businessesRepository: Repository<Business>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async getAvailableSlots(dto: AvailableSlotsDto): Promise<string[]> {
@@ -78,6 +81,7 @@ export class AppointmentsService {
     });
 
     // Filtrar slots que se solapan con reservas existentes
+
     return slots.filter((slot) => {
       const slotStart = this.timeToMinutes(slot);
       const slotEnd = slotStart + service.durationMinutes;
@@ -85,6 +89,7 @@ export class AppointmentsService {
       return !existingAppointments.some((appt) => {
         const apptStart = this.timeToMinutes(appt.startTime);
         const apptEnd = this.timeToMinutes(appt.endTime);
+
         // Hay solapamiento si el slot empieza antes que termine la reserva
         // y termina después que empiece la reserva
         return slotStart < apptEnd && slotEnd > apptStart;
@@ -92,10 +97,7 @@ export class AppointmentsService {
     });
   }
 
-  async create(
-    clientId: string,
-    dto: CreateAppointmentDto,
-  ): Promise<Appointment> {
+  async create(client: User, dto: CreateAppointmentDto): Promise<Appointment> {
     const service = await this.servicesRepository.findOne({
       where: { id: dto.serviceId, isActive: true },
     });
@@ -132,6 +134,7 @@ export class AppointmentsService {
 
     const business = await this.businessesRepository.findOne({
       where: { id: professional.businessId },
+      relations: ['user'],
     });
 
     // Si el negocio tiene confirmación automática, confirmar directo
@@ -141,7 +144,7 @@ export class AppointmentsService {
         : AppointmentStatus.PENDING;
 
     const appointment = this.appointmentsRepository.create({
-      clientId,
+      clientId: client.id,
       professionalId: dto.professionalId,
       serviceId: dto.serviceId,
       businessId: professional.businessId,
@@ -152,7 +155,43 @@ export class AppointmentsService {
       status,
     });
 
-    return this.appointmentsRepository.save(appointment);
+    const saved = await this.appointmentsRepository.save(appointment);
+
+    // Enviar emails según el modo de confirmación
+    if (status === AppointmentStatus.CONFIRMED) {
+      await this.notificationsService.sendAppointmentConfirmation({
+        clientEmail: client.email,
+        clientName: `${client.firstName} ${client.lastName}`,
+        businessName: business!.name,
+        date: dto.date,
+        startTime: dto.startTime,
+        serviceName: service.name,
+        professionalName: professional.name,
+      });
+    } else {
+      await this.notificationsService.sendAppointmentPending({
+        clientEmail: client.email,
+        clientName: `${client.firstName} ${client.lastName}`,
+        businessName: business!.name,
+        date: dto.date,
+        startTime: dto.startTime,
+        serviceName: service.name,
+      });
+
+      // Avisar al negocio que tiene una nueva reserva pendiente
+      if (business?.user?.email) {
+        await this.notificationsService.sendNewAppointmentToBusiness({
+          businessEmail: business.user.email,
+          businessName: business.name,
+          clientName: `${client.firstName} ${client.lastName}`,
+          date: dto.date,
+          startTime: dto.startTime,
+          serviceName: service.name,
+        });
+      }
+    }
+
+    return saved;
   }
 
   async findByBusiness(businessId: string): Promise<Appointment[]> {

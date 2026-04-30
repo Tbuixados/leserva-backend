@@ -19,6 +19,9 @@ import { Schedule } from './schedules/entities/schedule.entity';
 import { SchedulesModule } from './schedules/schedules.module';
 import { Appointment } from './appointments/entities/appointment.entity';
 import { AppointmentsModule } from './appointments/appointments.module';
+import { Review } from './reviews/entities/review.entity';
+import { ReviewsModule } from './reviews/reviews.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -44,6 +47,7 @@ import { AppointmentsModule } from './appointments/appointments.module';
           Professional,
           Schedule,
           Appointment,
+          Review,
         ],
         migrations: [],
         synchronize: process.env.NODE_ENV === 'development',
@@ -67,6 +71,8 @@ import { AppointmentsModule } from './appointments/appointments.module';
     ProfessionalsModule,
     SchedulesModule,
     AppointmentsModule,
+    ReviewsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
 })
