@@ -44,4 +44,12 @@ export class UsersService {
       updatedAt: user.updatedAt,
     };
   }
+
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { googleId } });
+  }
+
+  async linkGoogleAccount(id: string, googleId: string): Promise<void> {
+    await this.usersRepository.update(id, { googleId });
+  }
 }

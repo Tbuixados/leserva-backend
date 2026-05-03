@@ -216,13 +216,13 @@ export class AppointmentsService {
   ): Promise<Appointment> {
     const appointment = await this.appointmentsRepository.findOne({
       where: { id },
+      relations: ['client', 'business', 'service', 'professional'],
     });
 
     if (!appointment) {
       throw new NotFoundException('Reserva no encontrada');
     }
 
-    // Solo el negocio puede confirmar o completar
     if (
       [AppointmentStatus.CONFIRMED, AppointmentStatus.COMPLETED].includes(
         status,
@@ -234,7 +234,6 @@ export class AppointmentsService {
       );
     }
 
-    // El cliente solo puede cancelar sus propias reservas
     if (
       status === AppointmentStatus.CANCELLED &&
       appointment.clientId !== userId &&
@@ -246,7 +245,22 @@ export class AppointmentsService {
     }
 
     appointment.status = status;
-    return this.appointmentsRepository.save(appointment);
+    await this.appointmentsRepository.save(appointment);
+
+    // Enviar email de confirmación al cliente cuando el negocio confirma
+    if (status === AppointmentStatus.CONFIRMED) {
+      await this.notificationsService.sendAppointmentConfirmation({
+        clientEmail: appointment.client.email,
+        clientName: `${appointment.client.firstName} ${appointment.client.lastName}`,
+        businessName: appointment.business.name,
+        date: appointment.date,
+        startTime: appointment.startTime,
+        serviceName: appointment.service.name,
+        professionalName: appointment.professional.name,
+      });
+    }
+
+    return appointment;
   }
 
   // Genera slots de tiempo cada durationMinutes dentro del rango de horario
