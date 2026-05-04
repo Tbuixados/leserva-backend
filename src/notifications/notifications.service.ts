@@ -106,4 +106,29 @@ export class NotificationsService {
       this.logger.error('Error enviando email al negocio', error);
     }
   }
+
+  async sendEmailVerification(data: {
+    email: string;
+    name: string;
+    token: string;
+  }): Promise<void> {
+    try {
+      await this.resend.emails.send({
+        from: this.fromEmail,
+        to: data.email,
+        subject: 'Verificá tu cuenta en Leserva',
+        html: `
+        <h2>Bienvenido a Leserva, ${data.name}!</h2>
+        <p>Para activar tu cuenta hacé click en el siguiente link:</p>
+        <a href="${process.env.FRONTEND_URL}/auth/verify?token=${data.token}">
+          Verificar mi cuenta
+        </a>
+        <p>Este link expira en 24 horas.</p>
+        <p>Si no creaste una cuenta en Leserva ignorá este email.</p>
+      `,
+      });
+    } catch (error) {
+      this.logger.error('Error enviando email de verificación', error);
+    }
+  }
 }

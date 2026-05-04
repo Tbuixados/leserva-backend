@@ -52,4 +52,29 @@ export class UsersService {
   async linkGoogleAccount(id: string, googleId: string): Promise<void> {
     await this.usersRepository.update(id, { googleId });
   }
+
+  async findByVerificationToken(token: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { verificationToken: token },
+    });
+  }
+
+  async markAsVerified(id: string): Promise<void> {
+    await this.usersRepository.update(id, {
+      isVerified: true,
+      verificationToken: undefined,
+    });
+  }
+
+  async updateRefreshToken(
+    id: string,
+    refreshToken: string | null,
+  ): Promise<void> {
+    await this.usersRepository.update(id, {
+      refreshToken: refreshToken ?? undefined,
+    });
+  }
+  async findByRefreshToken(refreshToken: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { refreshToken } });
+  }
 }

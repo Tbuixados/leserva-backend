@@ -22,6 +22,7 @@ import { AppointmentsModule } from './appointments/appointments.module';
 import { Review } from './reviews/entities/review.entity';
 import { ReviewsModule } from './reviews/reviews.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     AppointmentsModule,
     ReviewsModule,
     NotificationsModule,
+    AdminModule,
   ],
   controllers: [AppController],
 })

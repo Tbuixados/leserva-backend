@@ -35,11 +35,20 @@ export class User {
   @Column({ nullable: true })
   phone!: string;
 
+  @Column({ name: 'is_verified', default: false })
+  isVerified!: boolean;
+
+  @Column({ name: 'verification_token', nullable: true })
+  verificationToken!: string;
+
   @Column({ name: 'avatar_url', nullable: true })
   avatarUrl!: string;
 
   @Column({ name: 'google_id', nullable: true, unique: true })
   googleId!: string;
+
+  @Column({ name: 'refresh_token', nullable: true })
+  refreshToken!: string;
 
   @Column({ name: 'is_active', default: true })
   isActive!: boolean;
